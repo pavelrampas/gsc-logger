@@ -10,7 +10,8 @@ DEFAULT_SCOPES = ["https://www.googleapis.com/auth/bigquery", "https://www.googl
 DATASET_ID = 'gsc_logger_sites'
 
 # Since GCS data is dated, specify the offset from today.
-OFFSET_DATE = 7
+START_OFFSET_DATE = 3
+END_OFFSET_DATE = 100
 
 # Should we auto remove DBs if we no longer have access.
 # Careful:  Could lose data if you accidentally lose connection.

@@ -41,8 +41,8 @@ def rate_limit(max_per_minute):
     return decorate
 
 # Returns the GCS format date based on OFFSET_DATE specified in config.py
-def get_offset_date():
-    return (datetime.now(pytz.timezone(cfg.GSC_TIMEZONE)) - timedelta(days=cfg.OFFSET_DATE)).strftime("%Y-%m-%d")
+def get_offset_date(offset):
+    return (datetime.now(pytz.timezone(cfg.GSC_TIMEZONE)) - timedelta(days=offset)).strftime("%Y-%m-%d")
 
 
 # Returns the GSC service
@@ -106,31 +106,31 @@ def execute_request(service, property_uri, request, max_retries=5, wait_interval
     return response
 
 # Given a site url string, loads all data for a particular date to BiqQuery
-def load_site_data(site):
+def load_site_data(site, offset):
 
     data = None
     loaded = False
 
     query = cfg.GSC_QUERY
 
-    if db.last_date(site) == get_offset_date():
+    if db.last_date(site) == get_offset_date(offset):
         #Already loaded
         log.info('Ignoring. Already run this day for site {0}.'.format(site))
         return False
 
-    query['startDate'] = get_offset_date()
-    query['endDate'] = get_offset_date()
+    query['startDate'] = get_offset_date(offset)
+    query['endDate'] = get_offset_date(offset)
 
 
     service = get_gsc_service()
 
+    rowsSent = 0
     while True:
 
         data = execute_request(service, site, query)
         if data and 'rows' in data:
             rows = data['rows']
             numRows = len(rows)
-            rowsSent = 0
 
             try:
                 result = bigq.stream_row_to_bigquery(site, rows)
@@ -143,7 +143,7 @@ def load_site_data(site):
                     continue
                 else:
                     if numRows and numRows > 0:
-                        db.add_entry(site, get_offset_date(),rowsSent)
+                        db.add_entry(site, get_offset_date(offset),rowsSent)
                     break
 
             except HttpError as e:
@@ -170,11 +170,12 @@ def run_gsc_cron():
 
         #load site data to BigQuery
         for site in sites:
-            loaded = load_site_data(site)
-            if loaded:
-                log.info('Site Data Loaded for {0}'.format(site))
-            else:
-                log.error('Could not load data for {0}'.format(site))
+            for x in range(cfg.START_OFFSET_DATE, cfg.END_OFFSET_DATE):
+                loaded = load_site_data(site, x)
+                if loaded:
+                    log.info('Site Data Loaded for {0}'.format(site))
+                else:
+                    log.error('Could not load data for {0}'.format(site))
 
         message = str(sites)
 
