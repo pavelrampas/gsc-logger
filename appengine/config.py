@@ -11,7 +11,7 @@ DATASET_ID = 'gsc_logger_sites'
 
 # Since GCS data is dated, specify the offset from today.
 START_OFFSET_DATE = 3
-END_OFFSET_DATE = 100
+END_OFFSET_DATE = 3
 
 # Should we auto remove DBs if we no longer have access.
 # Careful:  Could lose data if you accidentally lose connection.
