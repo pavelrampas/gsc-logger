@@ -138,7 +138,7 @@ def load_site_data(site, offset):
                 rowsSent += numRows
                 loaded = True
 
-                if numRows == 5000:
+                if numRows == 10000:
                     query['startRow'] = int(rowsSent + 1)
                     continue
                 else:

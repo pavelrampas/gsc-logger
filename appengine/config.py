@@ -65,6 +65,6 @@ GSC_QUERY = {
                    ]
                   }
                  ],
-                 "rowLimit": 5000
+                 "rowLimit": 10000
                 }
 
