@@ -194,7 +194,7 @@ def transform_rows(rows):
             item['insertId'] = str(uuid.uuid4())
             item['json'] = {
                             'query' : row['keys'][0],
-                            'date' : row['keys'][1],
+                            'query_date' : row['keys'][1],
                             'page' : row['keys'][2],
                             'device' : row['keys'][3],
                             'impressions' : row['impressions'],

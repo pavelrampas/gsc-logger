@@ -20,7 +20,7 @@ AUTO_REMOVE = False
 
 # Schema used to build the tables.  If you change the data pulled from GSC, you must change this.
 TABLE_SCHEMA = [
-                    {"type": "DATE", "name": "date"},
+                    {"type": "DATE", "name": "query_date"},
                     {"type": "STRING", "name": "query"},
                     {"type": "STRING", "name": "page"},
                     {"type": "STRING", "name": "device"},
