@@ -10,6 +10,7 @@ DEFAULT_SCOPES = ["https://www.googleapis.com/auth/bigquery", "https://www.googl
 DATASET_ID = 'gsc_logger_sites'
 
 # Since GCS data is dated, specify the offset from today.
+# START_OFFSET_DATE must be same or heighter than END_OFFSET_DATE
 START_OFFSET_DATE = 3
 END_OFFSET_DATE = 3
 
