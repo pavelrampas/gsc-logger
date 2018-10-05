@@ -12,7 +12,7 @@ class CronLog(ndb.Model):
     gsc_date = ndb.StringProperty(indexed=False)
     count = ndb.IntegerProperty(indexed=False, default=0)
     date = ndb.DateTimeProperty(auto_now_add=True)
-    
+
     @classmethod
     def query_log(cls, ancestor_key):
         return cls.query(ancestor=ancestor_key).order(-cls.date)
@@ -21,7 +21,7 @@ class CronLog(ndb.Model):
 # site: site url string
 # gsc_date: eg. yyyy-mm-dd
 def add_entry(site, gsc_date, count):
-    
+
     cronentry = CronLog( parent=site_key(site) )
     cronentry.gsc_date = gsc_date
     cronentry.count = count
@@ -37,21 +37,20 @@ def delete_entries():
 # Returns
 # gsc-style date or never string
 def last_date(site):
-    
+
     cronentry = CronLog.query_log(site_key(site)).fetch(1)
-    
+
     if len(cronentry) > 0:
         return cronentry[0].gsc_date
     else:
         return 'Never'
-    
+
 def last_count(site):
-    
+
     cronentry = CronLog.query_log(site_key(site)).fetch(1)
-    
+
     if len(cronentry) > 0:
         return cronentry[0].count
     else:
         return 0
-    
-    
+

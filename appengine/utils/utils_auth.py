@@ -15,4 +15,3 @@ def get_Auth():
     http = httplib2.Http(memcache, timeout=60)
     #http = httplib2.Http()
     return credentials.authorize(http)
-    

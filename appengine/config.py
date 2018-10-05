@@ -14,7 +14,7 @@ OFFSET_DATE = 7
 
 # Should we auto remove DBs if we no longer have access.
 # Careful:  Could lose data if you accidentally lose connection.
-# Databases can be removed manually at: https://bigquery.cloud.google.com/queries/gsc-logger 
+# Databases can be removed manually at: https://bigquery.cloud.google.com/queries/gsc-logger
 AUTO_REMOVE = False
 
 # Schema used to build the tables.  If you change the data pulled from GSC, you must change this.
@@ -24,8 +24,8 @@ TABLE_SCHEMA = [
                     {"type": "STRING", "name": "page"},
                     {"type": "STRING", "name": "device"},
                     {"type": "INTEGER", "name": "clicks"},
-                    {"type": "INTEGER", "name": "impressions"}, 
-                    {"type": "FLOAT", "name": "ctr"}, 
+                    {"type": "INTEGER", "name": "impressions"},
+                    {"type": "FLOAT", "name": "ctr"},
                     {"type": "FLOAT", "name": "position"}
                 ]
 

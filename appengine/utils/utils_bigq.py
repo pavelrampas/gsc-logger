@@ -11,13 +11,13 @@ import config as cfg
 
 import utils.utils_auth as auth
 from utils.utils_svcdata import ServiceData
-svcdata = ServiceData() 
+svcdata = ServiceData()
 
 import logging
 log = logging.getLogger(__name__)
 
 
-# Gets the BigQuery Service   
+# Gets the BigQuery Service
 def get_bq_service():
 
     service = discovery.build('bigquery', 'v2', http=auth.get_Auth())
@@ -36,7 +36,7 @@ def convert_table_name(url):
 
 # Checks if a dataset for this project has been created.
 def is_dataset_set():
-    
+
 
     try:
         service = get_bq_service()
@@ -63,11 +63,11 @@ def create_dataset():
         response = datasets.insert(projectId=svcdata['project_id'],body=dataset_data).execute()
 
         return response
-    
+
     except HttpError as e:
         log.error(
             'Cannot create dataset {0}, {1}'.format(cfg.DATASET_ID, e))
-        
+
         return {}
 
 # Creates a BigQuery table
@@ -82,7 +82,7 @@ def create_table(table,name):
             'datasetId': cfg.DATASET_ID
         }
     }
-        
+
     try:
         service = get_bq_service()
         table = service.tables().insert(
@@ -92,7 +92,7 @@ def create_table(table,name):
         ).execute()
 
         return table
-    
+
     except HttpError as e:
         log.error(('Cannot create table {0}.{1}\n'
                       'Http Error: {2}').format(cfg.DATASET_ID, table, e.content))
@@ -109,8 +109,8 @@ def deleteTable(tableId):
         log.error(('Cannot delete table {0}.{1}\n'
                       'Http Error: {2}').format(cfg.DATASET_ID, tableId, e.content))
         return False
-    
-# Returns list of all tables created in BiqQuery   
+
+# Returns list of all tables created in BiqQuery
 def listTables():
 
     try:
@@ -127,46 +127,46 @@ def listTables():
 
 # Creates or deletes tables based on Service credential access. Also creates dataset if not already created.
 def audit_tables(sites):
-    
+
     if not is_dataset_set():
         create_dataset()
-        
+
     if not is_dataset_set():
         log.error('Could not create dataset.')
         return False
-    
+
     site_ids = list(map(convert_table_id, sites))
     site_names = list(map(convert_table_name, sites))
-    
+
     tables = listTables()
-    
+
     table_ids = []
     new_tables = []
     remove_tables = []
-    
+
     for table in tables:
         table_ids.append(table['tableReference']['tableId'])
-    
+
     new_tables = [x for x in site_ids if x not in table_ids]
 
     for t in new_tables:
         n = site_names[site_ids.index(t)]
         create_table(t,n)
-        
-    if cfg.AUTO_REMOVE:  
+
+    if cfg.AUTO_REMOVE:
         remove_tables = [x for x in table_ids if x not in site_ids]
         for t in remove_tables:
             deleteTable(t)
-        
+
     log.info(('Added {0} tables and deleted {1} tables.').format(str(len(new_tables)),str(len(remove_tables))))
-    
+
     return True
-        
-    
+
+
 
 # Streams row data to Biqquery
 def stream_row_to_bigquery(site, rows):
-    
+
     insert_all_data = {
         'rows': transform_rows(rows)
     }
@@ -176,20 +176,20 @@ def stream_row_to_bigquery(site, rows):
         datasetId=cfg.DATASET_ID,
         tableId=convert_table_id(site),
         body=insert_all_data).execute(num_retries=cfg.STREAM_RETRIES)
-        
+
     log.info(json.dumps(result))
-    
+
     return result
 
 
-# Takes rows in GSC API format and transforms to BiqQuery readable data.     
+# Takes rows in GSC API format and transforms to BiqQuery readable data.
 def transform_rows(rows):
     #In: Raw data response from GSC
     data =[]
-    
+
     for row in rows:
-        
-        try: 
+
+        try:
             item = {}
             item['insertId'] = str(uuid.uuid4())
             item['json'] = {
@@ -203,12 +203,12 @@ def transform_rows(rows):
                             'position' : row['position']
                             }
             data.append(item)
-            
+
         except IndexError as e:
             log.error(('Error creating rows for Bigquery. {0}').format(e.content))
-            
-            
+
+
     return data
 
 
-        
+

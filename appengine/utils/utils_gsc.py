@@ -53,21 +53,21 @@ def get_gsc_service():
 
 # Lists all sites that are available to you based on your serice email address.
 def list_sites():
-    
+
     data = []
-    
+
     allowed = ['siteOwner','siteFullUser']
-    
-    service = get_gsc_service()   
+
+    service = get_gsc_service()
     site_list = service.sites().list().execute()
-    
+
     log.info(site_list)
     if site_list and 'siteEntry' in site_list:
         for site in site_list['siteEntry']:
             if site['permissionLevel'] in allowed:
                 data.append(site['siteUrl'])
-    
-    return data 
+
+    return data
 
 
 #Main request to GSC
@@ -107,23 +107,23 @@ def execute_request(service, property_uri, request, max_retries=5, wait_interval
 
 # Given a site url string, loads all data for a particular date to BiqQuery
 def load_site_data(site):
-    
+
     data = None
     loaded = False
-    
+
     query = cfg.GSC_QUERY
 
     if db.last_date(site) == get_offset_date():
         #Already loaded
         log.info('Ignoring. Already run this day for site {0}.'.format(site))
         return False
-        
+
     query['startDate'] = get_offset_date()
     query['endDate'] = get_offset_date()
-        
-    
+
+
     service = get_gsc_service()
-    
+
     while True:
 
         data = execute_request(service, site, query)
@@ -131,13 +131,13 @@ def load_site_data(site):
             rows = data['rows']
             numRows = len(rows)
             rowsSent = 0
-            
+
             try:
                 result = bigq.stream_row_to_bigquery(site, rows)
                 log.info('Added {0} rows to {1}'.format(numRows,site))
                 rowsSent += numRows
                 loaded = True
-                
+
                 if numRows == 5000:
                     query['startRow'] = int(rowsSent + 1)
                     continue
@@ -145,29 +145,29 @@ def load_site_data(site):
                     if numRows and numRows > 0:
                         db.add_entry(site, get_offset_date(),rowsSent)
                     break
-                
+
             except HttpError as e:
                 log.error("Stream to Bigquery Error. ", e.content)
                 break
-        
+
         else:
             break
-        
+
     return loaded
-        
+
 # Main Cron script.
 def run_gsc_cron():
-    
+
     sites = list_sites()
     error = False
     message = ""
-    
-    try: 
+
+    try:
         #Audit Sites
         audit = bigq.audit_tables(sites)
-        
+
         log.info('Tables Audited')
-        
+
         #load site data to BigQuery
         for site in sites:
             loaded = load_site_data(site)
@@ -175,13 +175,12 @@ def run_gsc_cron():
                 log.info('Site Data Loaded for {0}'.format(site))
             else:
                 log.error('Could not load data for {0}'.format(site))
-                
+
         message = str(sites)
-                
+
     except HttpError as e:
         log.error("GSC Cron Error, {0}".format(e.content))
         message = "GSC Cron Error, {0}".format(e.content)
         error = True
-    
+
     return error, message
-        
