@@ -120,7 +120,7 @@ def load_site_data(site, offset):
 
     query['startDate'] = get_offset_date(offset)
     query['endDate'] = get_offset_date(offset)
-
+    query['startRow'] = 0
 
     service = get_gsc_service()
 

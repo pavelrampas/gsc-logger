@@ -49,6 +49,7 @@ GSC_TIMEZONE = 'US/Eastern'
 GSC_QUERY = {
                  "startDate": "2017-07-01",
                  "endDate": "2017-07-31",
+                 "startRow": 0,
                  "dimensions": [
                   "query",
                   "date",
