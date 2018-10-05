@@ -170,7 +170,7 @@ def run_gsc_cron():
 
         #load site data to BigQuery
         for site in sites:
-            for x in range(cfg.START_OFFSET_DATE, (cfg.END_OFFSET_DATE + 1)):
+            for x in range(cfg.END_OFFSET_DATE, (cfg.START_OFFSET_DATE + 1)):
                 loaded = load_site_data(site, x)
                 if loaded:
                     log.info('Site Data Loaded for {0}'.format(site))
