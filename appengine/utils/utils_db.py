@@ -35,7 +35,7 @@ def delete_entries():
 # Parameters
 # site: site url string
 # Returns
-# gsc-style date or never string
+# gsc-style date or None
 def last_date(site):
 
     cronentry = CronLog.query_log(site_key(site)).fetch(1)
@@ -43,7 +43,7 @@ def last_date(site):
     if len(cronentry) > 0:
         return cronentry[0].gsc_date
     else:
-        return 'Never'
+        return None
 
 def last_count(site):
 
