@@ -11,6 +11,7 @@ DATASET_ID = 'gsc_logger_sites'
 
 # Since GCS data is dated, specify the offset from today.
 # START_OFFSET_DATE must be same or heighter than END_OFFSET_DATE
+# Dates range works only for new site. Then it download only new day with END_OFFSET_DATE.
 START_OFFSET_DATE = 3
 END_OFFSET_DATE = 3
 
